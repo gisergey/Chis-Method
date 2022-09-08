@@ -24,10 +24,10 @@ namespace Chis_Method
         которые в высоту учитываются,
         но не показываются, поэтому есть move_Down_Window константа*/
         const int move_Down_Window = 25;
-        const int Count_Points = 250;
         const int move_X = 50;
         const int move_Y = 50;
-
+        
+        int Count_Points = 11;
         double h;
         double mistake = Math.Pow(10, -6);
 
@@ -35,12 +35,34 @@ namespace Chis_Method
 
         Pen GraphicPen = new Pen(Color.Blue,2);
         Pen CoordinatPen = new Pen(Color.Purple,2);
+        Pen PointsPen = new Pen(Color.Gold, 2);
 
         public DrawMethodForm()
         {
-            h = (b - a) / (Count_Points - 1);
+            
             InitializeComponent();
          
+        }
+
+        private void AmountPoints_TrackBar_Scroll(object sender, EventArgs e)
+        {
+            Count_Points = AmountPoints_TrackBar.Value;
+            PointAmount_TextBox.Text = AmountPoints_TrackBar.Value.ToString();
+            Refresh();
+        }
+
+        private void PointAmount_TextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(PointAmount_TextBox.Text, out int result)
+                && result >= AmountPoints_TrackBar.Minimum
+                && result <= AmountPoints_TrackBar.Maximum)
+            {
+                AmountPoints_TrackBar.Value = result;
+                Count_Points = result;
+                Refresh();
+            }
+            else
+                PointAmount_TextBox.Text = Count_Points.ToString();
         }
 
         private void DrawMethodForm_Resize(object sender, EventArgs e)
@@ -54,6 +76,7 @@ namespace Chis_Method
         } 
         void DoMath()
         {
+            h = (b - a) / (Count_Points - 1);
             Start = new PointF(move_X, Height - move_Y- move_Down_Window);
             End_X = Start.Plus(new PointF(Width - move_X * 2, 0));
             End_Y = Start.Minus(new PointF(0, Height - move_Y * 2));
@@ -82,7 +105,8 @@ namespace Chis_Method
             PointF? f1 = null;
             step_xh = Step_X.Multiply((float)(h / (b - a)*2));
             f2 = Start;
-            for (x = a; x <= b; x += h)
+            int i = 0;
+            for (x = a; x <= b+mistake; x += h)
             {
                 y = 0;
                 n = 0;
@@ -98,14 +122,21 @@ namespace Chis_Method
                 f2.Y=Start.Y+Step_Y.Multiply((float)y).Y;
                 if(f1 != null)
                 {
-
+                    i++; 
                     graphics.DrawLine(GraphicPen, f1.Value, f2);
+                    graphics.FillEllipse(PointsPen.Brush, f1.Value.X-1, f1.Value.Y-1, 3, 3);
                 }
                 f1 = f2;
                 f2 = f2.Plus(step_xh);
-            
             }
+            f2=f2.Minus(step_xh);
+            
+            graphics.FillEllipse(PointsPen.Brush, f2.X - 1, f2.Y - 1, 3, 3);
 
+            if (i == Count_Points)
+            {
+                MessageBox.Show(i.ToString());
+            }
         }
     }
 }
