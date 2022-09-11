@@ -27,9 +27,11 @@ namespace Chis_Method
         const int move_X = 50;
         const int move_Y = 50;
         
+
         int Count_Points = 11;
         double h;
         double mistake = Math.Pow(10, -6);
+        double argument = 2 / Math.Sqrt(Math.PI);
 
         PointF Start,End_Y,End_X,Step_X,Step_Y;
 
@@ -117,8 +119,8 @@ namespace Chis_Method
                     k *= Find_q(x,n);
                     n++;
                 }
-                y *= 2;
-                y /= Math.PI;
+                y *= argument;
+                
                 f2.Y=Start.Y+Step_Y.Multiply((float)y).Y;
                 if(f1 != null)
                 {

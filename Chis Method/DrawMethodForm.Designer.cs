@@ -39,7 +39,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AmountPoints_TrackBar.BackColor = System.Drawing.Color.Black;
             this.AmountPoints_TrackBar.Location = new System.Drawing.Point(409, 12);
-            this.AmountPoints_TrackBar.Maximum = 201;
+            this.AmountPoints_TrackBar.Maximum = 501;
             this.AmountPoints_TrackBar.Minimum = 2;
             this.AmountPoints_TrackBar.Name = "AmountPoints_TrackBar";
             this.AmountPoints_TrackBar.Size = new System.Drawing.Size(463, 45);
