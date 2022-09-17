@@ -25,6 +25,14 @@ namespace Chis_Method
         {
             return new PointF(p1.X * mult, p1.Y * mult);
         }
+        public static PointF PlusY(this PointF p1, float Y)
+        {
+            return new PointF(p1.X, p1.Y + Y);
+        }
+        public static PointF PlusX(this PointF p1, float X)
+        {
+            return new PointF(p1.X+X, p1.Y);
+        }
         public static PointF Divide(this PointF p1, float divid)
         {
             return new PointF(p1.X / divid, p1.Y / divid);
@@ -35,5 +43,6 @@ namespace Chis_Method
                 return true;
             return false;
         }
+       
     }
 }
