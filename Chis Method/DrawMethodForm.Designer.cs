@@ -56,7 +56,7 @@
             this.PointAmount_TextBox.Name = "PointAmount_TextBox";
             this.PointAmount_TextBox.Size = new System.Drawing.Size(100, 44);
             this.PointAmount_TextBox.TabIndex = 1;
-            this.PointAmount_TextBox.Text = "11";
+            this.PointAmount_TextBox.Text = "6";
             this.PointAmount_TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.PointAmount_TextBox.TextChanged += new System.EventHandler(this.PointAmount_TextBox_TextChanged);
             // 

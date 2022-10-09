@@ -14,36 +14,43 @@ namespace Chis_Method
 
     public partial class DrawMethodForm : Form
     {
-        
+
         const double a = 0;
         const double b = 2;
-        
 
-        /*
-        хуйня какая-то, почемуто у формы как будто снизу еще невидимые 25 пикселей лежат,
-        которые в высоту учитываются,
-        но не показываются, поэтому есть move_Down_Window константа*/
+
+        const int RealPoints = 6;
         const int move_Down_Window = 25;
         const int move_X = 50;
         const int move_Y = 50;
-        
 
-        int Count_Points = 11;
+
+
+        int Count_Points = 6;
+        int maxX = 5;
+        double maxY = 0.001;
+        int howmuchcancount = 20;
+
         double h;
         double mistake = Math.Pow(10, -6);
         double argument = 2 / Math.Sqrt(Math.PI);
 
+        
+        
+       
+        double[,] points;
+        double[,] ar;
+
         PointF Start,End_Y,End_X,Step_X,Step_Y;
 
         Pen GraphicPen = new Pen(Color.Blue,2);
-        Pen CoordinatPen = new Pen(Color.Purple,2);
+        Pen CoordinatPen = new Pen(Color.White,2);
         Pen PointsPen = new Pen(Color.Gold, 2);
+        Pen CoorDinatsPointPen = new Pen(Color.Red, 2);
 
         public DrawMethodForm()
         {
-            
             InitializeComponent();
-         
         }
 
         private void AmountPoints_TrackBar_Scroll(object sender, EventArgs e)
@@ -72,22 +79,89 @@ namespace Chis_Method
             Refresh();
         }
         #region Math
+        double Fx(double x)
+        {
+            double y,k;
+            int n = 0;
+            y = 0;
+            k = x;
+            while (Math.Abs(k) > mistake)
+            {
+                y += k;
+                k *= Find_q(x, n);
+                n++;
+            }
+            y *= argument;
+
+            return y;
+        }
         double Find_q(double x,int n)
         {
             return -(x * x * (2 * n + 1)) / ((n + 1) * (2 * n + 3));
-        } 
+        }
+        void FillKefPolinomMass(double[,] Fx)
+        {
+            double delitel;
+            for (int j = 1; j < Fx.GetLength(0); j++)
+            {
+                for (int i = Fx.GetLength(0) - 1; i >= j; i--)
+                {
+                    delitel = (Fx[i, 0] - Fx[i - j, 0]);
+                    Fx[i, 1] = (Fx[i, 1] - Fx[i - 1, 1]) / delitel;
+                }
+            }
+            ar = Fx;
+            return;
+        }
+        double GetPolinom(double x)
+        {
+            double y = ar[ar.GetLength(0) - 1, 1];
+            for (int i = ar.GetLength(0) - 2; i >= 0; i--)
+                y = ar[i, 1] + (x - ar[i, 0]) * y;
+            return y;
+        }
         void DoMath()
         {
-            h = (b - a) / (Count_Points - 1);
+            points = new double[Count_Points, 2];
+
+            h = (b - a) / (RealPoints - 1);
+
+            ar = new double[RealPoints, 2];
+            for(int i = 0; i < RealPoints; i++)
+            {
+                ar[i, 0] = a + i * h;
+                ar[i, 1] = Fx(a + i * h);
+            }
+            FillKefPolinomMass(ar);
+            double maxer;
+            for (int i = 2; i < Count_Points; i++)
+            {
+                maxer = 0;
+                h = (b - a) / (i - 1);
+                for(double j = a; j <= b + mistake; j += h)
+                    if (maxer < Math.Abs(Fx(j) - GetPolinom(j)))
+                        maxer= Math.Abs(Fx(j) - GetPolinom(j)); 
+
+                points[i, 0] = i;
+                points[i, 1] = maxer;
+            }
+
+            // Для рисования штуки
+            maxX = Count_Points;
             Start = new PointF(move_X, Height - move_Y- move_Down_Window);
             End_X = Start.Plus(new PointF(Width - move_X * 2, 0));
             End_Y = Start.Minus(new PointF(0, Height - move_Y * 2));
-            Step_X = End_X.Minus(Start).Divide((float)2.2);
-            Step_Y = End_Y.Minus(Start).Divide((float)1.2);
+            Step_X = End_X.Minus(Start).Divide((float)(maxX*(1+1*0.2/howmuchcancount)));
+            Step_Y = End_Y.Minus(Start).Divide((float)(maxY*(1+0.2)));
+            
         }
         #endregion
         private void MethodDraw_Paint(object sender, PaintEventArgs e)
         {
+            int i;
+            double y, x;
+            PointF f2,f1;
+
             Graphics graphics = e.Graphics;
             DoMath();
             graphics.Clear(Color.Black);
@@ -95,49 +169,27 @@ namespace Chis_Method
             graphics.DrawLine(CoordinatPen, Start, End_X);
             graphics.DrawLine(CoordinatPen, Start, End_Y);
             
-            graphics.DrawString("1", Font, CoordinatPen.Brush, Start.Plus(Step_X));
-            graphics.DrawString("2", Font, CoordinatPen.Brush, Start.Plus(Step_X).Plus(Step_X));
-            graphics.DrawString("1", Font, CoordinatPen.Brush, Start.Plus(Step_Y));
-
-            double y, k, x;
-            int n;
-        
-            
-            PointF  f2,step_xh;
-            PointF? f1 = null;
-            step_xh = Step_X.Multiply((float)(h / (b - a)*2));
-            f2 = Start;
-            int i = 0;
-            for (x = a; x <= b+mistake; x += h)
+            int kefir = maxX / howmuchcancount > 0 ? maxX / howmuchcancount : 1;
+            for(i = kefir; i <= maxX; i+=kefir)
             {
-                y = 0;
-                n = 0;
-                k = x;
-                while (Math.Abs(k) > mistake)
-                {
-                    y += k;
-                    k *= Find_q(x,n);
-                    n++;
-                }
-                y *= argument;
-                
-                f2.Y=Start.Y+Step_Y.Multiply((float)y).Y;
-                if(f1 != null)
-                {
-                    i++; 
-                    graphics.DrawLine(GraphicPen, f1.Value, f2);
-                    graphics.FillEllipse(PointsPen.Brush, f1.Value.X-1, f1.Value.Y-1, 3, 3);
-                }
-                f1 = f2;
-                f2 = f2.Plus(step_xh);
+                graphics.DrawString(i.ToString(), Font, CoordinatPen.Brush, Start.Plus(Step_X.Multiply(i)));
+                graphics.FillEllipse(CoorDinatsPointPen.Brush, Start.Plus(Step_X.Multiply(i)).X - 1, Start.Plus(Step_X.Multiply(i)).Y - 2, 3, 3);
             }
-            f2=f2.Minus(step_xh);
             
-            graphics.FillEllipse(PointsPen.Brush, f2.X - 1, f2.Y - 1, 3, 3);
-
-            if (i == Count_Points)
+            graphics.DrawString(maxY.ToString(), Font, CoordinatPen.Brush, Start.Plus(Step_Y.Multiply(maxY)).Minus(new Point(9 * maxY.ToString().Length, 0)));
+            graphics.FillEllipse(CoorDinatsPointPen.Brush, Start.Plus(Step_Y.Multiply(maxY)).X-2, Start.Plus(Step_Y.Multiply(maxY)).Y - 1, 3, 3);
+            f1 = Start.Plus(Step_Y.Multiply((float)points[0, 1])).Plus(Step_X.Multiply((float)points[0, 0]));
+            
+            for (i = 1; i < Count_Points;i++)
             {
-                MessageBox.Show(i.ToString());
+                f2 = Start.Plus(Step_Y.Multiply((float)points[i, 1])).Plus(Step_X.Multiply((float)points[i, 0]));
+                graphics.DrawLine(GraphicPen,f1,f2);
+                f1 = f2;
+            }
+            for (i = 0; i < Count_Points; i++)
+            {
+                f1 = Start.Plus(Step_Y.Multiply((float)points[i, 1])).Plus(Step_X.Multiply((float)points[i, 0]));
+                graphics.FillEllipse(PointsPen.Brush, f1.X - 1, f1.Y - 1, 3, 3);
             }
         }
     }

@@ -25,6 +25,10 @@ namespace Chis_Method
         {
             return new PointF(p1.X * mult, p1.Y * mult);
         }
+        public static PointF Multiply(this PointF p1, double mult)
+        {
+            return new PointF((float)(p1.X * mult), (float)(p1.Y * mult));
+        }
         public static PointF Divide(this PointF p1, float divid)
         {
             return new PointF(p1.X / divid, p1.Y / divid);
