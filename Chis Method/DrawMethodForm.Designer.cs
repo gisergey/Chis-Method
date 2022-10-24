@@ -40,7 +40,7 @@
             this.AmountPoints_TrackBar.BackColor = System.Drawing.Color.Black;
             this.AmountPoints_TrackBar.Location = new System.Drawing.Point(409, 12);
             this.AmountPoints_TrackBar.Maximum = 501;
-            this.AmountPoints_TrackBar.Minimum = 2;
+            this.AmountPoints_TrackBar.Minimum = 11;
             this.AmountPoints_TrackBar.Name = "AmountPoints_TrackBar";
             this.AmountPoints_TrackBar.Size = new System.Drawing.Size(463, 45);
             this.AmountPoints_TrackBar.TabIndex = 0;
@@ -56,7 +56,7 @@
             this.PointAmount_TextBox.Name = "PointAmount_TextBox";
             this.PointAmount_TextBox.Size = new System.Drawing.Size(100, 44);
             this.PointAmount_TextBox.TabIndex = 1;
-            this.PointAmount_TextBox.Text = "6";
+            this.PointAmount_TextBox.Text = "11";
             this.PointAmount_TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.PointAmount_TextBox.TextChanged += new System.EventHandler(this.PointAmount_TextBox_TextChanged);
             // 

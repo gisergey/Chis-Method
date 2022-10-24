@@ -18,17 +18,18 @@ namespace Chis_Method
         const double a = 0;
         const double b = 2;
 
-
-        const int RealPoints = 6;
+        int StartReal = 6;
+        int RealPoints = 6;
+        int maxRealPoints = 42;
         const int move_Down_Window = 25;
         const int move_X = 50;
         const int move_Y = 50;
 
 
 
-        int Count_Points = 6;
+        const int Count_Points = 21;
         int maxX = 5;
-        double maxY = 0.001;
+        double maxY = 0.005;
         int howmuchcancount = 20;
 
         double h;
@@ -55,7 +56,7 @@ namespace Chis_Method
 
         private void AmountPoints_TrackBar_Scroll(object sender, EventArgs e)
         {
-            Count_Points = AmountPoints_TrackBar.Value;
+            //Count_Points = AmountPoints_TrackBar.Value;
             PointAmount_TextBox.Text = AmountPoints_TrackBar.Value.ToString();
             Refresh();
         }
@@ -67,7 +68,7 @@ namespace Chis_Method
                 && result <= AmountPoints_TrackBar.Maximum)
             {
                 AmountPoints_TrackBar.Value = result;
-                Count_Points = result;
+                //Count_Points = result;
                 Refresh();
             }
             else
@@ -122,32 +123,77 @@ namespace Chis_Method
         }
         void DoMath()
         {
-            points = new double[Count_Points, 2];
+            points = new double[maxRealPoints-RealPoints+1, 2];
 
-            h = (b - a) / (RealPoints - 1);
+            //h = (b - a) / (RealPoints - 1);
 
-            ar = new double[RealPoints, 2];
-            for(int i = 0; i < RealPoints; i++)
+            //ar = new double[RealPoints, 2];
+            //for(int i = 0; i < RealPoints; i++)
+            //{
+            //    ar[i, 0] = a + i * h;
+            //    ar[i, 1] = Fx(a + i * h);
+            //}
+            //FillKefPolinomMass(ar);
+            double maxer,maxmaxer,m;
+            int t = 0;
+            maxmaxer = 0;
+            for (int RealPoints = StartReal; RealPoints <= maxRealPoints; RealPoints++)
             {
-                ar[i, 0] = a + i * h;
-                ar[i, 1] = Fx(a + i * h);
-            }
-            FillKefPolinomMass(ar);
-            double maxer;
-            for (int i = 2; i < Count_Points; i++)
-            {
+                h = (double)(b - a) / (RealPoints - 1);
+
+                ar = new double[RealPoints, 2];
+                for (int i = 0; i < RealPoints; i++)
+                {
+                    ar[i, 0] = a + i * h;
+                    ar[i, 1] = Fx(a + i * h);
+                }
+                FillKefPolinomMass(ar);
+                h = (double)(b - a) / (Count_Points - 1);
                 maxer = 0;
-                h = (b - a) / (i - 1);
-                for(double j = a; j <= b + mistake; j += h)
-                    if (maxer < Math.Abs(Fx(j) - GetPolinom(j)))
-                        maxer= Math.Abs(Fx(j) - GetPolinom(j)); 
 
-                points[i, 0] = i;
-                points[i, 1] = maxer;
+                for (double x = a; x < b + mistake; x += h)
+                {
+                    if (Math.Abs(GetPolinom(x) - Fx(x)) > maxer)
+                    {
+                        maxer = Math.Abs(GetPolinom(x) - Fx(x));
+                    }
+                }
+                points[t, 0] = RealPoints;
+                points[t, 1] = maxer;
+                t++;
+                if (maxer > maxmaxer)
+                {
+                    maxmaxer = maxer;
+                }
+
             }
+
+
+            //for (int i = 2; i < Count_Points; i++)
+            //{
+            //    maxer = 0;
+            //    h = (b - a) / (i - 1);
+            //    for(double j = a; j <= b + mistake; j += h)
+            //        if (maxer < Math.Abs(Fx(j) - GetPolinom(j)))
+            //            maxer= Math.Abs(Fx(j) - GetPolinom(j)); 
+
+            //    points[i, 0] = i;
+            //    points[i, 1] = maxer;
+            //    if (maxer>maxmaxer)
+            //        maxmaxer = maxer;
+
+            //}
+            m = 1;
+            while (maxmaxer < 1)
+            {
+                m--;
+                maxmaxer *= 10;
+            }
+
+            maxY = Math.Pow(10, m);
 
             // Для рисования штуки
-            maxX = Count_Points;
+            maxX = maxRealPoints;
             Start = new PointF(move_X, Height - move_Y- move_Down_Window);
             End_X = Start.Plus(new PointF(Width - move_X * 2, 0));
             End_Y = Start.Minus(new PointF(0, Height - move_Y * 2));
@@ -159,7 +205,6 @@ namespace Chis_Method
         private void MethodDraw_Paint(object sender, PaintEventArgs e)
         {
             int i;
-            double y, x;
             PointF f2,f1;
 
             Graphics graphics = e.Graphics;
@@ -176,17 +221,21 @@ namespace Chis_Method
                 graphics.FillEllipse(CoorDinatsPointPen.Brush, Start.Plus(Step_X.Multiply(i)).X - 1, Start.Plus(Step_X.Multiply(i)).Y - 2, 3, 3);
             }
             
-            graphics.DrawString(maxY.ToString(), Font, CoordinatPen.Brush, Start.Plus(Step_Y.Multiply(maxY)).Minus(new Point(9 * maxY.ToString().Length, 0)));
-            graphics.FillEllipse(CoorDinatsPointPen.Brush, Start.Plus(Step_Y.Multiply(maxY)).X-2, Start.Plus(Step_Y.Multiply(maxY)).Y - 1, 3, 3);
+            for(double a = maxY / 10; a <= maxY + mistake; a += maxY / 10)
+            {
+                graphics.DrawString(a.ToString(), Font, CoordinatPen.Brush, Start.Plus(Step_Y.Multiply(a)).Minus(new Point(7 * a.ToString().Length, 0)));
+                graphics.FillEllipse(CoorDinatsPointPen.Brush, Start.Plus(Step_Y.Multiply(a)).X - 2, Start.Plus(Step_Y.Multiply(a)).Y - 1, 3, 3);
+            }
+           
             f1 = Start.Plus(Step_Y.Multiply((float)points[0, 1])).Plus(Step_X.Multiply((float)points[0, 0]));
-            
-            for (i = 1; i < Count_Points;i++)
+
+            for (i = 1; i <= maxRealPoints - StartReal; i++)
             {
                 f2 = Start.Plus(Step_Y.Multiply((float)points[i, 1])).Plus(Step_X.Multiply((float)points[i, 0]));
-                graphics.DrawLine(GraphicPen,f1,f2);
+                graphics.DrawLine(GraphicPen, f1, f2);
                 f1 = f2;
             }
-            for (i = 0; i < Count_Points; i++)
+            for (i = 0; i <= maxRealPoints - StartReal; i++)
             {
                 f1 = Start.Plus(Step_Y.Multiply((float)points[i, 1])).Plus(Step_X.Multiply((float)points[i, 0]));
                 graphics.FillEllipse(PointsPen.Brush, f1.X - 1, f1.Y - 1, 3, 3);
